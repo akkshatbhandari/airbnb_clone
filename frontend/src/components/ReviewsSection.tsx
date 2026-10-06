@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Review } from '@/lib/types';
-import { Star, MessageSquarePlus, X, Send } from 'lucide-react';
+import { Star, MessageSquarePlus, X, Send, ShieldCheck } from 'lucide-react';
 import { useRole } from '@/context/RoleContext';
 
 interface ReviewsSectionProps {
@@ -19,7 +19,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   rating: initialRating,
   reviewCount: initialReviewCount,
 }) => {
-  const { addToast } = useRole();
+  const { role, addToast } = useRole();
   const [reviewsList, setReviewsList] = useState<Review[]>(initialReviews);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newRating, setNewRating] = useState(5);
@@ -38,6 +38,12 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   const handleSubmitReview = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
+
+    if (role === 'HOST') {
+      addToast('Permission Denied', 'Hosts cannot write or edit guest reviews.', 'error');
+      setIsModalOpen(false);
+      return;
+    }
 
     setIsSubmitting(true);
     const createdReview: Review = {
@@ -63,7 +69,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
     };
 
     setReviewsList((prev) => [createdReview, ...prev]);
-    addToast('Review Submitted', 'Thank you for sharing your feedback!', 'success');
+    addToast('Review Submitted', 'Thank you for sharing your stay experience!', 'success');
     setNewComment('');
     setIsModalOpen(false);
     setIsSubmitting(false);
@@ -71,7 +77,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
 
   return (
     <div className="flex flex-col gap-8 py-8 border-t border-gray-200">
-      {/* Title & Rating & Write Review Button */}
+      {/* Title & Rating & Write Review Button (Guest Only) */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-2xl font-bold text-airbnb-dark">
           <Star className="w-6 h-6 fill-airbnb-dark text-airbnb-dark" />
@@ -80,13 +86,21 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
           <span>{reviewsList.length} review{reviewsList.length !== 1 ? 's' : ''}</span>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 border border-gray-300 hover:border-airbnb-dark rounded-xl px-4 py-2 text-sm font-semibold text-airbnb-dark transition-colors bg-white shadow-xs"
-        >
-          <MessageSquarePlus className="w-4 h-4 text-airbnb-red" />
-          <span>Write a Review</span>
-        </button>
+        {/* RESTRICT WRITE REVIEW TO GUEST MODE ONLY */}
+        {role === 'GUEST' ? (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 border border-gray-300 hover:border-airbnb-dark rounded-xl px-4 py-2 text-sm font-semibold text-airbnb-dark transition-colors bg-white shadow-xs"
+          >
+            <MessageSquarePlus className="w-4 h-4 text-airbnb-red" />
+            <span>Leave a Review</span>
+          </button>
+        ) : (
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800">
+            <ShieldCheck className="w-4 h-4 text-amber-600" />
+            <span>Verified guest feedback (Hosts cannot write or edit reviews)</span>
+          </div>
+        )}
       </div>
 
       {/* Category Ratings Metrics Grid */}
@@ -101,7 +115,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                   style={{ width: `${(m.score / 5) * 100}%` }}
                 />
               </div>
-              <span className="font-bold text-xs w-6">{m.score.toFixed(1)}</span>
+              <span className="font-bold text-xs w-6 text-airbnb-dark">{m.score.toFixed(1)}</span>
             </div>
           </div>
         ))}
@@ -139,8 +153,8 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
         )}
       </div>
 
-      {/* Write Review Modal */}
-      {isModalOpen && (
+      {/* Write Review Modal (Guest Only) */}
+      {isModalOpen && role === 'GUEST' && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
@@ -182,7 +196,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-airbnb-dark bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-airbnb-dark bg-white text-airbnb-dark"
                 />
               </div>
 

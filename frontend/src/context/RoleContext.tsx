@@ -36,9 +36,7 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (savedRole === 'GUEST' || savedRole === 'HOST') {
         setRoleState(savedRole);
       }
-    } catch (e) {
-      // localStorage unavailable in some environments
-    }
+    } catch (e) {}
 
     fetchWishlists()
       .then((items) => {
@@ -74,7 +72,6 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toggleWishlistId = (id: string) => {
     const wasSaved = wishlistIds.has(id);
 
-    // 1. Update local Set state cleanly
     setWishlistIds((prev) => {
       const next = new Set(prev);
       if (wasSaved) {
@@ -85,14 +82,12 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return next;
     });
 
-    // 2. Trigger side-effects outside of state updater callback
     if (wasSaved) {
       addToast('Removed from Wishlist', 'Item removed from your saved list', 'info');
     } else {
       addToast('Saved to Wishlist', 'Added to your favorites', 'success');
     }
 
-    // 3. Persist change to backend DB
     toggleWishlistApi(id).catch(() => {});
   };
 

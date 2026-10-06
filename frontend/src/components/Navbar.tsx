@@ -1,27 +1,38 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useRole } from '@/context/RoleContext';
-import { Search, Globe, Menu, User as UserIcon, Heart, Luggage, Building2, PlusCircle } from 'lucide-react';
+import { Search, Menu, Heart, Luggage, Building2, PlusCircle } from 'lucide-react';
 
 interface NavbarProps {
-  onOpenSearch?: () => void;
+  onOpenSearch?: (initialTab?: 'location' | 'dates' | 'guests') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
-  const pathname = usePathname();
   const router = useRouter();
   const { role, setRole, wishlistIds, addToast } = useRole();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleRole = () => {
     const nextRole = role === 'GUEST' ? 'HOST' : 'GUEST';
     setRole(nextRole);
     addToast(
       `Switched to ${nextRole === 'HOST' ? 'Host Mode' : 'Guest Mode'}`,
-      nextRole === 'HOST' ? 'You can now create and manage properties' : 'You can browse and book stays',
+      nextRole === 'HOST' ? 'You can now manage properties and view hosting stats' : 'You can browse and book stays',
       'info'
     );
     if (nextRole === 'HOST') {
@@ -32,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2 text-airbnb-red group">
@@ -47,28 +58,37 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
           </span>
         </Link>
 
-        {/* Center Search Bar Trigger */}
-        <div
-          onClick={onOpenSearch}
-          className="flex items-center border border-gray-300 rounded-full py-2 px-4 shadow-search hover:shadow-airbnb transition-all duration-200 cursor-pointer text-sm font-medium text-airbnb-dark bg-white"
-        >
-          <button className="px-3 font-semibold border-r border-gray-200 hover:text-airbnb-red transition-colors">
+        {/* Center Search Bar Trigger Pills */}
+        <div className="flex items-center border border-gray-300 rounded-full py-1.5 px-3 shadow-search hover:shadow-airbnb transition-all duration-200 text-sm font-medium text-airbnb-dark bg-white">
+          <button
+            onClick={() => onOpenSearch?.('location')}
+            className="px-3 font-semibold border-r border-gray-200 hover:text-airbnb-red transition-colors"
+          >
             Anywhere
           </button>
-          <button className="px-3 font-semibold border-r border-gray-200 hover:text-airbnb-red transition-colors hidden md:inline">
+          <button
+            onClick={() => onOpenSearch?.('dates')}
+            className="px-3 font-semibold border-r border-gray-200 hover:text-airbnb-red transition-colors hidden md:inline"
+          >
             Any week
           </button>
-          <button className="px-3 text-airbnb-gray hover:text-airbnb-dark transition-colors hidden lg:inline">
+          <button
+            onClick={() => onOpenSearch?.('guests')}
+            className="px-3 text-airbnb-gray hover:text-airbnb-dark transition-colors hidden lg:inline"
+          >
             Add guests
           </button>
-          <div className="bg-airbnb-red text-white p-2 rounded-full ml-2">
+          <div
+            onClick={() => onOpenSearch?.('location')}
+            className="bg-airbnb-red text-white p-2 rounded-full ml-1 cursor-pointer hover:bg-airbnb-hover transition-colors"
+          >
             <Search className="w-4 h-4 stroke-[2.5]" />
           </div>
         </div>
 
-        {/* Right Menu Controls */}
+        {/* Right Menu & Role Controls */}
         <div className="flex items-center gap-3">
-          {/* Guest vs Host Switcher */}
+          {/* Guest vs Host Switcher Pill */}
           <button
             onClick={toggleRole}
             className="text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-full hover:bg-gray-100 transition-colors text-airbnb-dark border border-gray-200 sm:border-transparent"
@@ -77,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
           </button>
 
           {/* User Menu Dropdown Button */}
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex items-center gap-3 border border-gray-300 rounded-full p-2 pl-3 hover:shadow-search transition-all duration-200 bg-white"
@@ -90,14 +110,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
 
             {/* Dropdown Menu */}
             {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-airbnb border border-gray-100 py-2 z-50 text-sm animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-airbnb border border-gray-100 py-2 z-50 text-sm animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-4 py-2 border-b border-gray-100">
                   <p className="font-semibold text-airbnb-dark">
                     {role === 'HOST' ? 'Sarah Jenkins (Host)' : 'Alex Morgan (Guest)'}
                   </p>
-                  <p className="text-xs text-airbnb-gray">Active Mode: {role}</p>
+                  <p className="text-xs text-airbnb-gray">Mode: {role}</p>
                 </div>
 
+                {/* Common Guest Links */}
                 <Link
                   href="/trips"
                   onClick={() => setIsMenuOpen(false)}
@@ -123,25 +144,30 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                   )}
                 </Link>
 
-                <div className="border-t border-gray-100 my-1"></div>
+                {/* HOST-ONLY LINKS */}
+                {role === 'HOST' && (
+                  <>
+                    <div className="border-t border-gray-100 my-1"></div>
 
-                <Link
-                  href="/host"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-airbnb-dark font-medium transition-colors"
-                >
-                  <Building2 className="w-4 h-4 text-airbnb-gray" />
-                  Host Dashboard
-                </Link>
+                    <Link
+                      href="/host"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-airbnb-dark font-medium transition-colors"
+                    >
+                      <Building2 className="w-4 h-4 text-airbnb-gray" />
+                      Host Dashboard
+                    </Link>
 
-                <Link
-                  href="/host/create"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-airbnb-red font-semibold transition-colors"
-                >
-                  <PlusCircle className="w-4 h-4 text-airbnb-red" />
-                  Create New Listing
-                </Link>
+                    <Link
+                      href="/host/create"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-airbnb-red font-semibold transition-colors"
+                    >
+                      <PlusCircle className="w-4 h-4 text-airbnb-red" />
+                      Create New Listing
+                    </Link>
+                  </>
+                )}
               </div>
             )}
           </div>

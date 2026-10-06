@@ -7,10 +7,10 @@ import { Navbar } from '@/components/Navbar';
 import { fetchListings, fetchBookings, deleteListing } from '@/lib/api';
 import { Listing, Booking } from '@/lib/types';
 import { useRole } from '@/context/RoleContext';
-import { Building2, Plus, Trash2, Calendar, Star, DollarSign, Users, Award } from 'lucide-react';
+import { Building2, Plus, Trash2, Edit3, Calendar, Star, DollarSign, Award, ShieldAlert } from 'lucide-react';
 
 export default function HostDashboardPage() {
-  const { addToast } = useRole();
+  const { role, setRole, addToast } = useRole();
   const [listings, setListings] = useState<Listing[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,8 +32,31 @@ export default function HostDashboardPage() {
     }
   };
 
+  if (role === 'GUEST') {
+    return (
+      <div className="flex-1 flex flex-col bg-white text-airbnb-dark">
+        <Navbar />
+        <main className="max-w-2xl mx-auto my-20 p-10 text-center bg-gray-50 rounded-3xl border border-gray-200 shadow-lg flex flex-col items-center gap-4">
+          <div className="p-4 bg-red-100 text-airbnb-red rounded-full">
+            <ShieldAlert className="w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-extrabold">Host Mode Required</h2>
+          <p className="text-sm text-airbnb-gray max-w-md">
+            You are currently in Guest mode. Switch to Host mode to view your hosting dashboard, edit properties, or publish new listings.
+          </p>
+          <button
+            onClick={() => setRole('HOST')}
+            className="mt-2 bg-airbnb-red text-white font-bold px-8 py-3.5 rounded-xl hover:bg-airbnb-hover transition-colors shadow-md text-sm"
+          >
+            Switch to Host Mode Now
+          </button>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col bg-white text-airbnb-dark">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex-1 flex flex-col gap-10">
@@ -41,7 +64,7 @@ export default function HostDashboardPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-extrabold text-airbnb-dark">Welcome back, Sarah!</h1>
+              <h1 className="text-3xl font-extrabold">Welcome back, Sarah!</h1>
               <Award className="w-6 h-6 text-airbnb-red fill-airbnb-red/10" />
             </div>
             <p className="text-sm text-airbnb-gray mt-1">Manage your properties, view bookings, and host travelers worldwide.</p>
@@ -64,7 +87,7 @@ export default function HostDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-airbnb-gray font-semibold uppercase">Active Listings</p>
-              <h3 className="text-2xl font-bold text-airbnb-dark">{listings.length}</h3>
+              <h3 className="text-2xl font-bold">{listings.length}</h3>
             </div>
           </div>
 
@@ -74,7 +97,7 @@ export default function HostDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-airbnb-gray font-semibold uppercase">Total Reservations</p>
-              <h3 className="text-2xl font-bold text-airbnb-dark">{bookings.length}</h3>
+              <h3 className="text-2xl font-bold">{bookings.length}</h3>
             </div>
           </div>
 
@@ -84,14 +107,14 @@ export default function HostDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-airbnb-gray font-semibold uppercase">Superhost Rating</p>
-              <h3 className="text-2xl font-bold text-airbnb-dark">4.95 ★</h3>
+              <h3 className="text-2xl font-bold">4.95 ★</h3>
             </div>
           </div>
         </div>
 
         {/* Owned Listings Section */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold text-airbnb-dark">Your Properties</h2>
+          <h2 className="text-2xl font-bold">Your Properties</h2>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-pulse">
@@ -125,16 +148,17 @@ export default function HostDashboardPage() {
                           <span>{l.rating.toFixed(2)}</span>
                         </div>
                       </div>
-                      <h3 className="font-bold text-base text-airbnb-dark line-clamp-1 mt-1">{l.title}</h3>
-                      <p className="text-xs font-bold text-airbnb-dark mt-1">${l.price_per_night} <span className="font-normal text-airbnb-gray">/ night</span></p>
+                      <h3 className="font-bold text-base line-clamp-1 mt-1">{l.title}</h3>
+                      <p className="text-xs font-bold mt-1">${l.price_per_night} <span className="font-normal text-airbnb-gray">/ night</span></p>
                     </div>
 
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-xs">
                       <Link
-                        href={`/listings/${l.id}`}
-                        className="font-bold text-airbnb-dark underline hover:opacity-80"
+                        href={`/host/edit/${l.id}`}
+                        className="font-bold text-airbnb-dark hover:text-airbnb-red flex items-center gap-1 transition-colors"
                       >
-                        View property
+                        <Edit3 className="w-3.5 h-3.5" />
+                        Edit Listing
                       </Link>
 
                       <button

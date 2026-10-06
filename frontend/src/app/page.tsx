@@ -19,6 +19,7 @@ export default function HomePage() {
   const [filters, setFilters] = useState<SearchFilters>({});
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchInitialTab, setSearchInitialTab] = useState<'location' | 'dates' | 'guests'>('location');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showMap, setShowMap] = useState(false);
 
@@ -38,6 +39,11 @@ export default function HomePage() {
       .finally(() => setIsLoading(false));
   }, [selectedCategoryId, filters]);
 
+  const handleOpenSearch = (tab: 'location' | 'dates' | 'guests' = 'location') => {
+    setSearchInitialTab(tab);
+    setIsSearchOpen(true);
+  };
+
   const handleSearch = (newFilters: SearchFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
@@ -47,9 +53,9 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col relative pb-20">
+    <div className="flex-1 flex flex-col relative pb-20 bg-white">
       {/* Navigation Header */}
-      <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
+      <Navbar onOpenSearch={handleOpenSearch} />
 
       {/* Category Pills Bar */}
       <CategoryBar
@@ -91,6 +97,7 @@ export default function HomePage() {
       {/* Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
+        initialTab={searchInitialTab}
         onClose={() => setIsSearchOpen(false)}
         onSearch={handleSearch}
       />

@@ -1,17 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Navbar } from '@/components/Navbar';
-import { createListing } from '@/lib/api';
+import { fetchListingById } from '@/lib/api';
 import { useRole } from '@/context/RoleContext';
-import { Building2, X, Image as ImageIcon, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Building2, X, Image as ImageIcon, CheckCircle2, ArrowLeft } from 'lucide-react';
 
-export default function CreateListingPage() {
+export default function EditListingPage() {
+  const params = useParams();
+  const id = params.id as string;
   const router = useRouter();
-  const { role, setRole, addToast } = useRole();
+  const { role, addToast } = useRole();
 
+  const [isLoading, setIsLoading] = useState(true);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('cat_beach');
@@ -26,35 +29,31 @@ export default function CreateListingPage() {
   const [bathrooms, setBathrooms] = useState(2);
 
   const [imageUrlInput, setImageUrlInput] = useState('');
-  const [images, setImages] = useState<string[]>([
-    'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80'
-  ]);
-
+  const [images, setImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (role === 'GUEST') {
-    return (
-      <div className="flex-1 flex flex-col bg-white text-airbnb-dark">
-        <Navbar />
-        <main className="max-w-xl mx-auto my-20 p-10 text-center bg-gray-50 rounded-3xl border border-gray-200 shadow-lg flex flex-col items-center gap-4">
-          <div className="p-4 bg-red-100 text-airbnb-red rounded-full">
-            <ShieldAlert className="w-10 h-10" />
-          </div>
-          <h2 className="text-2xl font-extrabold">Host Mode Required</h2>
-          <p className="text-sm text-airbnb-gray">
-            Switch to Host mode to publish new listings.
-          </p>
-          <button
-            onClick={() => setRole('HOST')}
-            className="mt-2 bg-airbnb-red text-white font-bold px-8 py-3.5 rounded-xl hover:bg-airbnb-hover transition-colors shadow-md text-sm"
-          >
-            Switch to Host Mode
-          </button>
-        </main>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (id) {
+      fetchListingById(id).then((listing) => {
+        if (listing) {
+          setTitle(listing.title);
+          setDescription(listing.description);
+          setCategoryId(listing.category_id || 'cat_beach');
+          setPropertyType(listing.property_type || 'Entire place');
+          setCity(listing.city);
+          setCountry(listing.country);
+          setAddress(listing.address);
+          setPricePerNight(listing.price_per_night);
+          setMaxGuests(listing.max_guests);
+          setBedrooms(listing.bedrooms);
+          setBeds(listing.beds);
+          setBathrooms(listing.bathrooms);
+          setImages(listing.images?.map((img) => img.url) || []);
+        }
+        setIsLoading(false);
+      });
+    }
+  }, [id]);
 
   const handleAddImage = () => {
     if (imageUrlInput.trim()) {
@@ -76,39 +75,76 @@ export default function CreateListingPage() {
 
     setIsSubmitting(true);
     try {
-      await createListing({
-        category_id: categoryId,
-        title,
-        description,
-        property_type: propertyType,
-        city,
-        country,
-        address: address || `${city}, ${country}`,
-        price_per_night: Number(pricePerNight),
-        max_guests: Number(maxGuests),
-        bedrooms: Number(bedrooms),
-        beds: Number(beds),
-        bathrooms: Number(bathrooms),
-        images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80']
+      const res = await fetch(`http://localhost:8000/api/listings/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category_id: categoryId,
+          title,
+          description,
+          property_type: propertyType,
+          city,
+          country,
+          address,
+          price_per_night: Number(pricePerNight),
+          max_guests: Number(maxGuests),
+          bedrooms: Number(bedrooms),
+          beds: Number(beds),
+          bathrooms: Number(bathrooms),
+          images: images
+        })
       });
 
-      addToast('Listing Published!', `"${title}" is now live on Airbnb`, 'success');
+      addToast('Listing Updated!', `"${title}" has been saved successfully`, 'success');
       router.push('/host');
     } catch (err: any) {
-      addToast('Creation Failed', err.message || 'Could not save listing', 'error');
+      addToast('Update Failed', err.message || 'Could not update listing', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (role === 'GUEST') {
+    return (
+      <div className="flex-1 flex flex-col bg-white text-airbnb-dark">
+        <Navbar />
+        <div className="max-w-xl mx-auto my-20 p-8 text-center bg-gray-50 rounded-3xl border border-gray-200">
+          <Building2 className="w-12 h-12 text-airbnb-red mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-airbnb-dark mb-2">Host Mode Required</h2>
+          <p className="text-sm text-airbnb-gray mb-6">Switch to Host mode to edit your listings.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex flex-col bg-white">
+        <Navbar />
+        <div className="max-w-4xl mx-auto p-10 w-full animate-pulse flex flex-col gap-6">
+          <div className="h-8 bg-gray-200 rounded w-1/3" />
+          <div className="h-64 bg-gray-200 rounded-3xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-white text-airbnb-dark">
       <Navbar />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex-1">
+        <button
+          onClick={() => router.push('/host')}
+          className="flex items-center gap-2 text-xs font-bold text-airbnb-gray hover:text-airbnb-dark mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Host Dashboard
+        </button>
+
         <div className="flex items-center gap-3 mb-8">
           <Building2 className="w-8 h-8 text-airbnb-red" />
-          <h1 className="text-3xl font-extrabold">Create a New Listing</h1>
+          <h1 className="text-3xl font-extrabold">Edit Property Listing</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-8 bg-gray-50/50 p-8 rounded-3xl border border-gray-200">
@@ -120,7 +156,6 @@ export default function CreateListingPage() {
               <label className="text-xs font-bold uppercase block mb-1">Property Title *</label>
               <input
                 type="text"
-                placeholder="e.g. Modern Coastal Villa with Panoramic Ocean Views"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -132,7 +167,6 @@ export default function CreateListingPage() {
               <label className="text-xs font-bold uppercase block mb-1">Description *</label>
               <textarea
                 rows={4}
-                placeholder="Describe what makes your space unique..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
@@ -150,7 +184,6 @@ export default function CreateListingPage() {
                 <label className="text-xs font-bold uppercase block mb-1">City *</label>
                 <input
                   type="text"
-                  placeholder="e.g. Miami Beach"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   required
@@ -162,7 +195,6 @@ export default function CreateListingPage() {
                 <label className="text-xs font-bold uppercase block mb-1">Country *</label>
                 <input
                   type="text"
-                  placeholder="e.g. United States"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                   required
@@ -268,7 +300,7 @@ export default function CreateListingPage() {
               className="bg-airbnb-red text-white font-bold px-8 py-3.5 rounded-xl hover:bg-airbnb-hover transition-colors shadow-md text-base flex items-center gap-2"
             >
               <CheckCircle2 className="w-5 h-5" />
-              <span>{isSubmitting ? 'Publishing...' : 'Publish Listing'}</span>
+              <span>{isSubmitting ? 'Saving Changes...' : 'Save Changes'}</span>
             </button>
           </div>
         </form>

@@ -51,7 +51,7 @@ export default function ListingDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-white">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-12 w-full animate-pulse flex flex-col gap-6">
           <div className="h-8 bg-gray-200 rounded w-1/2" />
@@ -63,7 +63,7 @@ export default function ListingDetailPage() {
 
   if (!listing) {
     return (
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-white">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-20 text-center">
           <h2 className="text-2xl font-bold text-airbnb-dark">Listing not found</h2>
@@ -87,15 +87,15 @@ export default function ListingDetailPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col bg-white text-airbnb-dark transition-colors duration-200">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col gap-6">
         {/* Title Header */}
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-airbnb-dark tracking-tight">{listing.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{listing.title}</h1>
           
-          <div className="flex flex-wrap items-center justify-between text-sm text-airbnb-dark gap-4">
+          <div className="flex flex-wrap items-center justify-between text-sm gap-4">
             <div className="flex items-center gap-2 font-semibold">
               <Star className="w-4 h-4 fill-airbnb-dark text-airbnb-dark" />
               <span>{listing.rating.toFixed(2)}</span>
@@ -143,7 +143,7 @@ export default function ListingDetailPage() {
             {/* Host Header */}
             <div className="flex items-center justify-between pb-6 border-b border-gray-200">
               <div>
-                <h2 className="text-xl font-bold text-airbnb-dark">
+                <h2 className="text-xl font-bold">
                   {listing.property_type} hosted by {listing.host?.name || 'Sarah'}
                 </h2>
                 <p className="text-sm text-airbnb-gray mt-1">
@@ -164,25 +164,25 @@ export default function ListingDetailPage() {
             {/* Key Features Highlights */}
             <div className="flex flex-col gap-5 pb-6 border-b border-gray-200 text-sm">
               <div className="flex items-start gap-4">
-                <DoorOpen className="w-6 h-6 text-airbnb-dark shrink-0 mt-0.5" />
+                <DoorOpen className="w-6 h-6 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-airbnb-dark">Self check-in</h4>
+                  <h4 className="font-semibold">Self check-in</h4>
                   <p className="text-xs text-airbnb-gray">Check yourself in with the keypad.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <Calendar className="w-6 h-6 text-airbnb-dark shrink-0 mt-0.5" />
+                <Calendar className="w-6 h-6 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-airbnb-dark">Free cancellation for 48 hours</h4>
+                  <h4 className="font-semibold">Free cancellation for 48 hours</h4>
                   <p className="text-xs text-airbnb-gray">Get a full refund if you change your mind.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <ShieldCheck className="w-6 h-6 text-airbnb-dark shrink-0 mt-0.5" />
+                <ShieldCheck className="w-6 h-6 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-airbnb-dark">Airbnb Cover Protection</h4>
+                  <h4 className="font-semibold">Airbnb Cover Protection</h4>
                   <p className="text-xs text-airbnb-gray">Every booking includes free protection from Host cancellations.</p>
                 </div>
               </div>
@@ -190,15 +190,15 @@ export default function ListingDetailPage() {
 
             {/* Description */}
             <div className="pb-6 border-b border-gray-200">
-              <p className="text-sm text-airbnb-dark leading-relaxed whitespace-pre-line">{listing.description}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-line text-airbnb-dark">{listing.description}</p>
             </div>
 
             {/* Amenities Section */}
             <div className="pb-6 border-b border-gray-200 flex flex-col gap-4">
-              <h3 className="text-xl font-bold text-airbnb-dark">What this place offers</h3>
+              <h3 className="text-xl font-bold">What this place offers</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {listing.amenities?.map((amenity) => (
-                  <div key={amenity.id} className="flex items-center gap-3 text-sm text-airbnb-dark">
+                  <div key={amenity.id} className="flex items-center gap-3 text-sm">
                     {amenityIconMap[amenity.icon] || <Wifi className="w-5 h-5 text-airbnb-dark" />}
                     <span>{amenity.name}</span>
                   </div>
