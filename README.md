@@ -142,5 +142,27 @@ look or else discard it.
 7. Include leave a review section after a completed stay for guest. Mind it that this feature is
 only for guest and host must not be able to edit the reviews.
 8. Cancellation of trip by guest have bad UI/UX experience (contains an image of simple alert for reference)
-2. Guest list should be visible in this way for checkout (contains an image for reference)
-3. The guest lists is not shown on clicking it.(contains an image for reference)
+9. Guest list should be visible in this way for checkout (contains an image for reference)
+10. The guest lists is not shown on clicking it.(contains an image for reference)
+
+
+
+---------------------------------------------------------------------
+
+                      Prompting with AI
+
+---------------------------------------------------------------------
+
+Initial prompt
+If you were hiring manager trying to hire a candidate. You have to provide an assignment to the candidate which has to be submitted within 24 hours. The candidate is allowed to use any sort of AI tools and technology. Even you yourself encourage the candidate to leverage the use of AI. The evaluation is done on the basis of full stack development of Airbnb clone given in the document attached. 
+---------------------------------------------------------------------------------------------------
+So, if I were the candidate how should I proceed to handle the assignment and complete it. What do you want to see in the candidate to implement and understand from the assignment in this short time window for full stack development? 
+----------------------------------------------------------------------------------
+It is at least known to me that in this small deadline a hiring manager won't be looking for deep implementation of concurrency or scaling of the system at backend as scaling about applying engineering principles upon deployment and performance monitoring and front end system design.
+                                              |
+                                              |
+                                              |Prepared PRD, TRD, App Flow, UI/UX Document, Backend Schema Document
+                                              |
+                                              |
+                                              |
+                                          ......Further Prompting
