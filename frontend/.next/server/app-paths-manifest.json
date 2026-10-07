@@ -1,6 +1,10 @@
 {
-  "/page": "app/page.js",
-  "/listings/[id]/page": "app/listings/[id]/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/host/page": "app/host/page.js",
-  "/trips/page": "app/trips/page.js"
+  "/host/edit/[id]/page": "app/host/edit/[id]/page.js",
+  "/host/create/page": "app/host/create/page.js",
+  "/listings/[id]/page": "app/listings/[id]/page.js",
+  "/page": "app/page.js",
+  "/trips/page": "app/trips/page.js",
+  "/wishlists/page": "app/wishlists/page.js"
 }

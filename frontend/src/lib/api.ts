@@ -306,7 +306,7 @@ export async function createBooking(data: {
       body: JSON.stringify(data)
     });
     if (res.ok) return await res.json();
-    const errData = await res.json();
+    const errData = await res.json().catch(() => ({}));
     throw new Error(errData.detail || 'Failed to create booking');
   } catch (e: any) {
     if (e.message) throw e;

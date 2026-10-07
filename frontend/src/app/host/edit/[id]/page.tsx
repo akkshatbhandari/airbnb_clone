@@ -75,7 +75,8 @@ export default function EditListingPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/listings/${id}`, {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+      const res = await fetch(`${API_BASE_URL}/listings/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -94,6 +95,11 @@ export default function EditListingPage() {
           images: images
         })
       });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Could not update listing');
+      }
 
       addToast('Listing Updated!', `"${title}" has been saved successfully`, 'success');
       router.push('/host');
