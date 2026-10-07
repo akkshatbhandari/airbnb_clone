@@ -155,14 +155,11 @@ only for guest and host must not be able to edit the reviews.
 
 Initial prompt
 If you were hiring manager trying to hire a candidate. You have to provide an assignment to the candidate which has to be submitted within 24 hours. The candidate is allowed to use any sort of AI tools and technology. Even you yourself encourage the candidate to leverage the use of AI. The evaluation is done on the basis of full stack development of Airbnb clone given in the document attached. 
----------------------------------------------------------------------------------------------------
+
 So, if I were the candidate how should I proceed to handle the assignment and complete it. What do you want to see in the candidate to implement and understand from the assignment in this short time window for full stack development? 
-----------------------------------------------------------------------------------
+
 It is at least known to me that in this small deadline a hiring manager won't be looking for deep implementation of concurrency or scaling of the system at backend as scaling about applying engineering principles upon deployment and performance monitoring and front end system design.
-                                              |
-                                              |
-                                              |Prepared PRD, TRD, App Flow, UI/UX Document, Backend Schema Document
-                                              |
-                                              |
-                                              |
-                                          ......Further Prompting
+
+---------Prepared PRD, TRD, App Flow, UI/UX Document, Backend Schema Document
+
+Further Prompting
