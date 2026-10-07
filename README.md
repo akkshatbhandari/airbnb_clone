@@ -117,3 +117,30 @@ BOOKINGS (id, listing_id, guest_id, check_in, check_out, guests_count, total_pri
 REVIEWS (id, listing_id, author_id, rating, cleanliness, accuracy, communication, location, check_in_rating, value_rating, comment)
 WISHLISTS (id, user_id, listing_id)
 ```
+
+
+
+
+-----------------------------------------------------------------
+                                                                |
+                                                                |
+        Problems Lists faced during AI powered development      |
+                                                                |
+                                                                |
+-----------------------------------------------------------------
+
+1. Being a guest, I am able to see host dashboard.(contains an image for reference)
+2. Guest list should be visible in this way for checkout. (contains an image for reference)
+3. An unnecessary lagging or no respond to some clicks is observed at some time.
+4. Search bar optimization is required such that anywhere pops field for only location, any
+week pops field for only time and add guests pops field for number of guests only.
+Combining these search field should work. If not entered any value in those field neglect
+those null fields. (contains an image for reference)
+5. Host is able to create a listing but is not able to edit listing.
+6. Interactive map with listing pins is not satisfiable. If possible include it with real premium
+look or else discard it.
+7. Include leave a review section after a completed stay for guest. Mind it that this feature is
+only for guest and host must not be able to edit the reviews.
+8. Cancellation of trip by guest have bad UI/UX experience (contains an image of simple alert for reference)
+2. Guest list should be visible in this way for checkout (contains an image for reference)
+3. The guest lists is not shown on clicking it.(contains an image for reference)
